@@ -8,29 +8,36 @@
     <title>Party Member Details</title>
 </head>
 <body>
-    <h1>Party Member Details</h1>
-    <div id="member-details">
+    <div class="container">
+        <div class="left-half">
+            <h1>Party Member Details</h1>
+            <div id="member-details"></div>
+
+            <h2>Health & XP</h2>
+            <h3>Health: <span id="member-health">Loading...</span></h3>
+            <h3>XP: <span id="member-xp">Loading...</span></h3>
+            <h3>Level: <span id="member-level">Loading...</span></h3>
+
+            <h3>Edit Health</h3>
+            <form id="edit-health-form" class="form-container">
+                <input type="number" id="health-input" placeholder="Health" min="0" required>
+                <button type="submit" class="btn btn-primary">Update Health</button>
+            </form>
+
+            <h3>Edit XP</h3>
+            <form id="edit-xp-form" class="form-container">
+                <input type="number" id="xp-input" placeholder="XP" min="0" required>
+                <button type="submit" class="btn btn-primary">Update XP</button>
+            </form>
+
+            <a href="../index.html" class="btn btn-secondary">Back to Party List</a>
+        </div>
+
+        <div class="right-half">
+            <h2>Equipment</h2>
+            <div id="equipment"></div>
+        </div>
     </div>
-    <h2>Equipment</h2>
-    <div id="equipment">
-    </div>
-    <h3>Health: <span id="member-health">Loading...</span></h3>
-    <h3>XP: <span id="member-xp">Loading...</span></h3>
-    <h3>Level: <span id="member-level">Loading...</span></h3>
-
-    <h3>Edit Health</h3>
-    <form id="edit-health-form">
-        <input type="number" id="health-input" placeholder="Health" min="0" required>
-        <button type="submit">Update Health</button>
-    </form>
-
-    <h3>Edit XP</h3>
-    <form id="edit-xp-form">
-        <input type="number" id="xp-input" placeholder="XP" min="0" required>
-        <button type="submit">Update XP</button>
-    </form>
-
-    <a href="../index.html">Back to Party List</a>
 
     <script src="../js/detail.js"></script>
 </body>

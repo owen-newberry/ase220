@@ -7,26 +7,33 @@
     <link rel="stylesheet" href="../css/styles.css">
 </head>
 <body>
-    <h1 id="member-name">Managing Equipment</h1>
-    <button id="back-btn">Back to Party List</button>
+    <button id="back-btn" class="btn btn-secondary">Back to Party List</button>
+    <div class="container">
+        
+        <div class="left-half">
+            <h1 id="member-name">Managing Equipment</h1>
 
-    <div>
-        <button id="armor-tab">Armor</button>
-        <button id="weapons-tab">Weapons</button>
-        <button id="misc-tab">Miscellaneous</button>
+            <div class="button-container">
+                <button id="armor-tab" class="btn btn-outline-primary">Armor</button>
+                <button id="weapons-tab" class="btn btn-outline-primary">Weapons</button>
+                <button id="misc-tab" class="btn btn-outline-primary">Miscellaneous</button>
+            </div>
+        </div>
+
+        <div class="right-half">
+            <h2>Current Equipment</h2>
+            <ul id="armor-current-list"></ul>
+            <ul id="weapons-current-list"></ul>
+            <ul id="misc-current-list"></ul>
+
+            <h2>Available Equipment</h2>
+            <ul id="armor-list"></ul>
+            <ul id="weapons-list"></ul>
+            <ul id="misc-list"></ul>
+
+            <button id="load-more-btn" class="btn btn-primary">Load More</button>
+        </div>
     </div>
-
-    <h2>Current Equipment</h2>
-    <ul id="armor-current-list"></ul>
-    <ul id="weapons-current-list"></ul>
-    <ul id="misc-current-list"></ul>
-
-    <h2>Available Equipment</h2>
-    <ul id="armor-list"></ul>
-    <ul id="weapons-list"></ul>
-    <ul id="misc-list"></ul>
-
-    <button id="load-more-btn">Load More</button>
 
     <script src="../js/add-equipment.js"></script>
 </body>

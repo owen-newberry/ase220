@@ -1,46 +1,95 @@
-function getMemberById(id) {
+let partyData = [];
+
+const blobUrl = 'https://api.jsonbin.io/v3/b/67d119af8960c979a56fee3c';
+
+fetchPartyData();
+
+async function fetchPartyData() {
+    try {
+        const response = await fetch(blobUrl, {
+            method: 'GET',
+            headers: {
+                'X-Master-Key': '$2a$10$kbMZq5216WIBSG3qZKCxtuKqtIoLuLtZjeYF/OtJfQ6JBKR6RADRy',
+                'Content-Type': 'application/json',
+            }
+        });
+        const data = await response.json();
+        if (!response.ok) throw new Error('Failed to fetch party data');
+        partyData = data.record.record;
+    } catch (error) {
+        console.error('Error fetching party data:', error);
+    }
+}
+
+async function savePartyData() {
+    try {
+        const response = await fetch(blobUrl, {
+            method: 'PUT',
+            headers: {
+                'X-Master-Key': '$2a$10$kbMZq5216WIBSG3qZKCxtuKqtIoLuLtZjeYF/OtJfQ6JBKR6RADRy',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ record: partyData }),
+        });
+        if (!response.ok) throw new Error('Failed to save party data');
+    } catch (error) {
+        console.error('Error saving party data:', error);
+    }
+}
+
+async function getMemberById(id) {
+    await fetchPartyData();
+    console.log(partyData);
     return partyData.find(member => member.id === id);
 }
 
-function displayMemberDetails() {
+async function displayMemberDetails() {
     const urlParams = new URLSearchParams(window.location.search);
     const memberId = parseInt(urlParams.get('id'), 10);
 
-    const member = getMemberById(memberId);
-    const memberDetails = document.getElementById('member-details');
-    const healthSpan = document.getElementById('member-health');
-    const xpSpan = document.getElementById('member-xp');
-    const levelSpan = document.getElementById('member-level');
+    try {
+        const member = await getMemberById(memberId);
 
-    if (member) {
-        memberDetails.innerHTML = `
-            <h2>${member.name}</h2>
-            <p><strong>Class:</strong> ${member.class}</p>
-            <p><strong>XP:</strong> ${member.xp}</p>
-            <p><strong>Level:</strong> ${member.level}</p>
-            <p><strong>Proficiency Bonus:</strong> +${member.bonus}</p>
-        `;
+        console.log('Fetched member:', member);
 
-        healthSpan.textContent = member.health;
-        xpSpan.textContent = member.xp;
-        levelSpan.textContent = member.level;
+        const memberDetails = document.getElementById('member-details');
+        const healthSpan = document.getElementById('member-health');
+        const xpSpan = document.getElementById('member-xp');
+        const levelSpan = document.getElementById('member-level');
 
-        displayEquipment(member.equipment);
+        if (member) {
+            memberDetails.innerHTML = `
+                <h2>${member.name}</h2>
+                <p><strong>Class:</strong> ${member.class}</p>
+                <p><strong>XP:</strong> ${member.xp}</p>
+                <p><strong>Level:</strong> ${member.level}</p>
+                <p><strong>Proficiency Bonus:</strong> +${member.bonus}</p>
+            `;
 
-        document.getElementById('edit-health-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            updateHealth(member, document.getElementById('health-input').value);
-        });
+            healthSpan.textContent = member.health;
+            xpSpan.textContent = member.xp;
+            levelSpan.textContent = member.level;
 
-        document.getElementById('edit-xp-form').addEventListener('submit', function(e) {
-            e.preventDefault();
-            updateXP(member, document.getElementById('xp-input').value);
-        });
+            displayEquipment(member.equipment);
 
-    } else {
-        memberDetails.innerHTML = '<p>Member not found.</p>';
+            document.getElementById('edit-health-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateHealth(member, document.getElementById('health-input').value);
+            });
+
+            document.getElementById('edit-xp-form').addEventListener('submit', function(e) {
+                e.preventDefault();
+                updateXP(member, document.getElementById('xp-input').value);
+            });
+
+        } else {
+            memberDetails.innerHTML = '<p>Member not found.</p>';
+        }
+    } catch (error) {
+        console.error('Error displaying member details:', error);
     }
 }
+
 
 function updateHealth(member, health) {
     if (health >= 0) {

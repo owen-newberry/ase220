@@ -1,7 +1,6 @@
 let partyData = [];
 
-//JSONBlob URL http://jsonblob.com/1349183542348931072
-const jsonBlobUrl = '../data/party.json';
+const blobUrl = 'https://api.jsonbin.io/v3/b/67d119af8960c979a56fee3c';
 
 const xpThresholds = [
     { xp: 0, level: 1, bonus: 2 },
@@ -30,47 +29,38 @@ fetchPartyData();
 
 document.getElementById('add-member-form').addEventListener('submit', addMember);
 
-//Function to fetch party data
-/* async function fetchPartyData() {
+async function fetchPartyData() {
     try {
-        console.log('Fetching party data from JSONBlob...');
-        const response = await fetch(jsonBlobUrl);
+        const response = await fetch(blobUrl, {
+            method: 'GET',
+            headers: {
+                'X-Master-Key': '$2a$10$kbMZq5216WIBSG3qZKCxtuKqtIoLuLtZjeYF/OtJfQ6JBKR6RADRy',
+                'Content-Type': 'application/json',
+            }
+        });
+        const data = await response.json();
         if (!response.ok) throw new Error('Failed to fetch party data');
-        partyData = await response.json();
-        console.log('Fetched party data:', partyData); // Log fetched data
+        partyData = data.record.record;
         displayParty(partyData);
     } catch (error) {
         console.error('Error fetching party data:', error);
     }
-} */
-function fetchPartyData() {
-    const data = localStorage.getItem('partyData');
-    if (data) {
-        partyData = JSON.parse(data);
-        console.log('Fetched party data from localStorage:', partyData);
-    } else {
-        partyData = []; // Initialize empty array if no data exists
-        console.log('No party data found in localStorage. Initializing empty array.');
-    }
-    displayParty(partyData);
 }
 
-//Function to save party data
-/* async function savePartyData() {
+async function savePartyData() {
     try {
-        const response = await fetch(jsonBlobUrl, {
+        const response = await fetch(blobUrl, {
             method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(partyData),
+            headers: {
+                'X-Master-Key': '$2a$10$kbMZq5216WIBSG3qZKCxtuKqtIoLuLtZjeYF/OtJfQ6JBKR6RADRy',
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ record: partyData }),
         });
         if (!response.ok) throw new Error('Failed to save party data');
     } catch (error) {
         console.error('Error saving party data:', error);
     }
-} */
-function savePartyData() {
-    localStorage.setItem('partyData', JSON.stringify(partyData));
-    console.log('Party data saved to localStorage:', partyData);
 }
 
 function displayParty(party) {
@@ -78,33 +68,57 @@ function displayParty(party) {
     partyList.innerHTML = '';
 
     party.forEach(member => {
-        const li = document.createElement('li');
+        const listItem = document.createElement('li');
+        listItem.classList.add('party-item', 'list-group-item');
+
+        // Container for name + buttons
+        const memberContainer = document.createElement('div');
+        memberContainer.classList.add('member-container');
+
+        // Member Name
         const detailLink = document.createElement('a');
         detailLink.href = `detail.html?id=${member.id}`;
         detailLink.textContent = `${member.name} (Class: ${member.class}, XP: ${member.xp}, Level: ${member.level})`;
-        li.appendChild(detailLink);
 
+        // Buttons Container
+        const buttonContainer = document.createElement('div');
+        buttonContainer.classList.add('button-container');
+
+        // Add XP Button
         const addXpBtn = document.createElement('button');
         addXpBtn.textContent = 'Add XP';
+        addXpBtn.className = "btn btn-danger-xs";
         addXpBtn.onclick = () => addXp(member.id);
 
-         const editHealthBtn = document.createElement('button');
-         editHealthBtn.textContent = 'Edit Health';
-         editHealthBtn.onclick = () => editHealth(member.id);
- 
-         const addEquipmentBtn = document.createElement('button');
-         addEquipmentBtn.textContent = 'Add Equipment';
-         addEquipmentBtn.onclick = () => addEquipment(member.id);
- 
-         const removeBtn = document.createElement('button');
-         removeBtn.textContent = 'Remove';
-         removeBtn.onclick = () => removeMember(member.id, li);
- 
-         li.appendChild(addXpBtn);
-         li.appendChild(editHealthBtn);
-         li.appendChild(addEquipmentBtn);
-        li.appendChild(removeBtn);
-        partyList.appendChild(li);
+        // Edit Health Button
+        const editHealthBtn = document.createElement('button');
+        editHealthBtn.textContent = 'Edit Health';
+        editHealthBtn.className = "btn btn-warning-xs";
+        editHealthBtn.onclick = () => editHealth(member.id);
+
+        // Manage Equipment Button
+        const manageEquipmentBtn = document.createElement('button');
+        manageEquipmentBtn.textContent = 'Manage Equipment';
+        manageEquipmentBtn.className = "btn btn-info-xs";
+        manageEquipmentBtn.onclick = () => manageEquipment(member.id);
+
+        // Remove Button
+        const removeBtn = document.createElement('button');
+        removeBtn.textContent = 'Remove';
+        removeBtn.className = "btn btn-danger-xs";
+        removeBtn.onclick = () => removeMember(member.id, listItem);
+
+        // Append buttons to container
+        buttonContainer.appendChild(addXpBtn);
+        buttonContainer.appendChild(editHealthBtn);
+        buttonContainer.appendChild(manageEquipmentBtn);
+        buttonContainer.appendChild(removeBtn);
+
+        // Append elements
+        memberContainer.appendChild(detailLink);
+        memberContainer.appendChild(buttonContainer);
+        listItem.appendChild(memberContainer);
+        partyList.appendChild(listItem);
     });
 }
 
@@ -113,22 +127,22 @@ async function addMember(e) {
     
     const name = document.getElementById('member-name').value.trim();
     const classType = document.getElementById('member-class').value.trim();
-    const xp = document.getElementById('member-xp').value.trim();
+    const xp = parseInt(document.getElementById('member-xp').value.trim()) || 0;
     const level = calculateLevel(xp);
-    const health = level*5 + 3;
-    const bonus = xpThresholds[level-1].bonus
+    const health = level * 5 + 3;
+    const bonus = xpThresholds[level - 1].bonus;
 
     if (name && classType) {
-        const newId = partyData.length ? Math.max(partyData.map(member => member.id)) + 1 : 1;
+        const newId = partyData.length ? Math.max(...partyData.map(member => member.id)) + 1 : 1;
 
         const newMember = {
             id: newId,
             name: name,
             class: classType,
-            xp: xp || 0,
+            xp: xp,
             level: level,
             bonus: bonus,
-            health: health || 100,
+            health: health,
             equipment: {
                 armor: [],
                 weapons: [],
@@ -140,13 +154,11 @@ async function addMember(e) {
 
         displayParty(partyData);
 
-        document.getElementById('member-name').value = '';
-        document.getElementById('member-class').value = '';
-        document.getElementById('member-xp').value = '';
+        document.getElementById('add-member-form').reset();
     }
 }
 
-async function removeMember(id, element) {
+async function removeMember(id) {
     const confirmation = confirm('Are you sure you want to delete this member? This action cannot be undone.');
     if (confirmation) {
         partyData = partyData.filter(member => member.id !== id);
@@ -186,7 +198,7 @@ function editHealth(id) {
     }
 }
 
-function addEquipment(id) {
+function manageEquipment(id) {
     const url = `add-equipment.html?id=${id}`;
     window.location.href = url;
 }

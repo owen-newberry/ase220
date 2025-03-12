@@ -1,6 +1,9 @@
 // Global variable to store party data
 let partyData = [];
 
+//JSONBlob URL
+const jsonBlobUrl = 'http://jsonblob.com/1349183542348931072';
+
 // XP thresholds for level progression
 const xpThresholds = [
     { xp: 0, level: 1, bonus: 2 },
@@ -25,8 +28,36 @@ const xpThresholds = [
     { xp: 355000, level: 20, bonus: 6 },
 ];
 
+fetchPartyData();
+
 // Event listener for the add member form
 document.getElementById('add-member-form').addEventListener('submit', addMember);
+
+//Function to fetch party data
+async function fetchPartyData() {
+    try {
+        const response = await fetch(jsonBlobUrl);
+        if (!response.ok) throw new Error('Failed to fetch party data');
+        partyData = await response.json();
+        displayParty(partyData); // Display the fetched data
+    } catch (error) {
+        console.error('Error fetching party data:', error);
+    }
+}
+
+//Function to save party data
+async function savePartyData() {
+    try {
+        const response = await fetch(jsonBlobUrl, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(partyData),
+        });
+        if (!response.ok) throw new Error('Failed to save party data');
+    } catch (error) {
+        console.error('Error saving party data:', error);
+    }
+}
 
 // Function to display party members
 function displayParty(party) {
@@ -35,8 +66,12 @@ function displayParty(party) {
 
     party.forEach(member => {
         const li = document.createElement('li');
-        li.textContent = `${member.name} (Class: ${member.class}, XP: ${member.xp}, Level: ${member.level}, Proficiency: +${member.bonus})`;
-        
+        // Link to the detail page
+        const detailLink = document.createElement('a');
+        detailLink.href = `detail.html?id=${member.id}`; // Link to detail page with member ID
+        detailLink.textContent = `${member.name} (Class: ${member.class}, XP: ${member.xp}, Level: ${member.level}, Proficiency: +${member.bonus})`;
+        li.appendChild(detailLink);
+
         // Create Add XP button
         const addXpBtn = document.createElement('button');
         addXpBtn.textContent = 'Add XP';
@@ -47,7 +82,7 @@ function displayParty(party) {
         removeBtn.textContent = 'Remove';
         removeBtn.onclick = () => removeMember(member.id, li);
 
-        // Append button to the list item
+        // Append buttons to the list item
         li.appendChild(addXpBtn);
         li.appendChild(removeBtn);
         partyList.appendChild(li);
@@ -55,7 +90,7 @@ function displayParty(party) {
 }
 
 // Function to add a new party member
-function addMember(e) {
+async function addMember(e) {
     e.preventDefault();  // This prevents the default form submission (page refresh)
     
     const name = document.getElementById('member-name').value.trim();
@@ -78,6 +113,7 @@ function addMember(e) {
             bonus: bonus
         };
         partyData.push(newMember);
+        await savePartyData(); // Save to JSONBlob
 
         // Re-display the updated list
         displayParty(partyData);
@@ -90,16 +126,17 @@ function addMember(e) {
 }
 
 // Function to remove a party member
-function removeMember(id, element) {
+async function removeMember(id, element) {
     const confirmation = confirm('Are you sure you want to delete this member? This action cannot be undone.');
     if (confirmation) {
         partyData = partyData.filter(member => member.id !== id);
+        await savePartyData();
         displayParty(partyData);
     }
 }
 
 // Function to add XP to a party member
-function addXp(id) {
+async function addXp(id) {
     // Find the member by ID
     const member = partyData.find(member => member.id === id);
     if (member) {
@@ -108,6 +145,9 @@ function addXp(id) {
         // Check if the input is a valid number
         if (!isNaN(xpToAdd) && xpToAdd !== null) {
             member.xp += parseInt(xpToAdd, 10); // Add XP
+            member.level = calculateLevel(member.xp); // Recalculate level
+            member.bonus = xpThresholds[member.level - 1].bonus; // Update bonus
+            await savePartyData();
             displayParty(partyData); // Update the list
         } else {
             alert("Invalid XP value!");

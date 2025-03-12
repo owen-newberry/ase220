@@ -10,8 +10,26 @@
 <body>
     <h1>Party Member Details</h1>
     <div id="member-details">
-        <!-- Member details will be dynamically inserted here -->
     </div>
+    <h2>Equipment</h2>
+    <div id="equipment">
+    </div>
+    <h3>Health: <span id="member-health">Loading...</span></h3>
+    <h3>XP: <span id="member-xp">Loading...</span></h3>
+    <h3>Level: <span id="member-level">Loading...</span></h3>
+
+    <h3>Edit Health</h3>
+    <form id="edit-health-form">
+        <input type="number" id="health-input" placeholder="Health" min="0" required>
+        <button type="submit">Update Health</button>
+    </form>
+
+    <h3>Edit XP</h3>
+    <form id="edit-xp-form">
+        <input type="number" id="xp-input" placeholder="XP" min="0" required>
+        <button type="submit">Update XP</button>
+    </form>
+
     <a href="../index.html">Back to Party List</a>
 
     <script src="../js/detail.js"></script>

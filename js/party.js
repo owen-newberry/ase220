@@ -1,10 +1,8 @@
-// Global variable to store party data
 let partyData = [];
 
-//JSONBlob URL
-const jsonBlobUrl = 'http://jsonblob.com/1349183542348931072';
+//JSONBlob URL http://jsonblob.com/1349183542348931072
+const jsonBlobUrl = '../data/party.json';
 
-// XP thresholds for level progression
 const xpThresholds = [
     { xp: 0, level: 1, bonus: 2 },
     { xp: 300, level: 2, bonus: 2 },
@@ -30,23 +28,35 @@ const xpThresholds = [
 
 fetchPartyData();
 
-// Event listener for the add member form
 document.getElementById('add-member-form').addEventListener('submit', addMember);
 
 //Function to fetch party data
-async function fetchPartyData() {
+/* async function fetchPartyData() {
     try {
+        console.log('Fetching party data from JSONBlob...');
         const response = await fetch(jsonBlobUrl);
         if (!response.ok) throw new Error('Failed to fetch party data');
         partyData = await response.json();
-        displayParty(partyData); // Display the fetched data
+        console.log('Fetched party data:', partyData); // Log fetched data
+        displayParty(partyData);
     } catch (error) {
         console.error('Error fetching party data:', error);
     }
+} */
+function fetchPartyData() {
+    const data = localStorage.getItem('partyData');
+    if (data) {
+        partyData = JSON.parse(data);
+        console.log('Fetched party data from localStorage:', partyData);
+    } else {
+        partyData = []; // Initialize empty array if no data exists
+        console.log('No party data found in localStorage. Initializing empty array.');
+    }
+    displayParty(partyData);
 }
 
 //Function to save party data
-async function savePartyData() {
+/* async function savePartyData() {
     try {
         const response = await fetch(jsonBlobUrl, {
             method: 'PUT',
@@ -57,39 +67,47 @@ async function savePartyData() {
     } catch (error) {
         console.error('Error saving party data:', error);
     }
+} */
+function savePartyData() {
+    localStorage.setItem('partyData', JSON.stringify(partyData));
+    console.log('Party data saved to localStorage:', partyData);
 }
 
-// Function to display party members
 function displayParty(party) {
     const partyList = document.getElementById('party-list');
-    partyList.innerHTML = ''; // Clear existing list
+    partyList.innerHTML = '';
 
     party.forEach(member => {
         const li = document.createElement('li');
-        // Link to the detail page
         const detailLink = document.createElement('a');
-        detailLink.href = `detail.html?id=${member.id}`; // Link to detail page with member ID
-        detailLink.textContent = `${member.name} (Class: ${member.class}, XP: ${member.xp}, Level: ${member.level}, Proficiency: +${member.bonus})`;
+        detailLink.href = `detail.html?id=${member.id}`;
+        detailLink.textContent = `${member.name} (Class: ${member.class}, XP: ${member.xp}, Level: ${member.level})`;
         li.appendChild(detailLink);
 
-        // Create Add XP button
         const addXpBtn = document.createElement('button');
         addXpBtn.textContent = 'Add XP';
         addXpBtn.onclick = () => addXp(member.id);
 
-        // Create Remove button
-        const removeBtn = document.createElement('button');
-        removeBtn.textContent = 'Remove';
-        removeBtn.onclick = () => removeMember(member.id, li);
-
-        // Append buttons to the list item
-        li.appendChild(addXpBtn);
+         const editHealthBtn = document.createElement('button');
+         editHealthBtn.textContent = 'Edit Health';
+         editHealthBtn.onclick = () => editHealth(member.id);
+ 
+         const addEquipmentBtn = document.createElement('button');
+         addEquipmentBtn.textContent = 'Add Equipment';
+         addEquipmentBtn.onclick = () => addEquipment(member.id);
+ 
+         const removeBtn = document.createElement('button');
+         removeBtn.textContent = 'Remove';
+         removeBtn.onclick = () => removeMember(member.id, li);
+ 
+         li.appendChild(addXpBtn);
+         li.appendChild(editHealthBtn);
+         li.appendChild(addEquipmentBtn);
         li.appendChild(removeBtn);
         partyList.appendChild(li);
     });
 }
 
-// Function to add a new party member
 async function addMember(e) {
     e.preventDefault();  // This prevents the default form submission (page refresh)
     
@@ -97,6 +115,7 @@ async function addMember(e) {
     const classType = document.getElementById('member-class').value.trim();
     const xp = document.getElementById('member-xp').value.trim();  // Get XP value (if applicable)
     const level = calculateLevel(xp);
+    const health = level*5 + 3;
     const bonus = xpThresholds[level-1].bonus
 
     if (name && classType) {
@@ -110,7 +129,13 @@ async function addMember(e) {
             class: classType,
             xp: xp || 0, // If XP is not provided, set it to 0
             level: level,
-            bonus: bonus
+            bonus: bonus,
+            health: health || 100, // Default health to 100 if not provided
+            equipment: {
+                armor: [],
+                weapons: [],
+                misc: [],
+            },
         };
         partyData.push(newMember);
         await savePartyData(); // Save to JSONBlob
@@ -153,6 +178,26 @@ async function addXp(id) {
             alert("Invalid XP value!");
         }
     }
+}
+
+// Function to edit health of a party member
+function editHealth(id) {
+    const member = partyData.find(member => member.id === id);
+    if (member) {
+        const newHealth = prompt(`Edit health for ${member.name}:`, member.health);
+        if (newHealth !== null && !isNaN(newHealth)) {
+            member.health = parseInt(newHealth, 10);
+            savePartyData();
+            displayParty(partyData);
+        } else {
+            alert('Invalid health value!');
+        }
+    }
+}
+
+function addEquipment(id) {
+    const url = `add-equipment.html?id=${id}`; // Redirect to add-equipment page with member ID
+    window.location.href = url;
 }
 
 // Function to calculate level based on XP

@@ -109,28 +109,26 @@ function displayParty(party) {
 }
 
 async function addMember(e) {
-    e.preventDefault();  // This prevents the default form submission (page refresh)
+    e.preventDefault();
     
     const name = document.getElementById('member-name').value.trim();
     const classType = document.getElementById('member-class').value.trim();
-    const xp = document.getElementById('member-xp').value.trim();  // Get XP value (if applicable)
+    const xp = document.getElementById('member-xp').value.trim();
     const level = calculateLevel(xp);
     const health = level*5 + 3;
     const bonus = xpThresholds[level-1].bonus
 
     if (name && classType) {
-        // Generate new ID
         const newId = partyData.length ? Math.max(partyData.map(member => member.id)) + 1 : 1;
 
-        // Add new member
         const newMember = {
             id: newId,
             name: name,
             class: classType,
-            xp: xp || 0, // If XP is not provided, set it to 0
+            xp: xp || 0,
             level: level,
             bonus: bonus,
-            health: health || 100, // Default health to 100 if not provided
+            health: health || 100,
             equipment: {
                 armor: [],
                 weapons: [],
@@ -138,19 +136,16 @@ async function addMember(e) {
             },
         };
         partyData.push(newMember);
-        await savePartyData(); // Save to JSONBlob
+        await savePartyData();
 
-        // Re-display the updated list
         displayParty(partyData);
 
-        // Clear input fields
         document.getElementById('member-name').value = '';
         document.getElementById('member-class').value = '';
         document.getElementById('member-xp').value = '';
     }
 }
 
-// Function to remove a party member
 async function removeMember(id, element) {
     const confirmation = confirm('Are you sure you want to delete this member? This action cannot be undone.');
     if (confirmation) {
@@ -160,27 +155,23 @@ async function removeMember(id, element) {
     }
 }
 
-// Function to add XP to a party member
 async function addXp(id) {
-    // Find the member by ID
     const member = partyData.find(member => member.id === id);
     if (member) {
         const xpToAdd = prompt(`How many XP to add to ${member.name}?`, "0");
         
-        // Check if the input is a valid number
         if (!isNaN(xpToAdd) && xpToAdd !== null) {
-            member.xp += parseInt(xpToAdd, 10); // Add XP
-            member.level = calculateLevel(member.xp); // Recalculate level
-            member.bonus = xpThresholds[member.level - 1].bonus; // Update bonus
+            member.xp += parseInt(xpToAdd, 10);
+            member.level = calculateLevel(member.xp);
+            member.bonus = xpThresholds[member.level - 1].bonus;
             await savePartyData();
-            displayParty(partyData); // Update the list
+            displayParty(partyData);
         } else {
             alert("Invalid XP value!");
         }
     }
 }
 
-// Function to edit health of a party member
 function editHealth(id) {
     const member = partyData.find(member => member.id === id);
     if (member) {
@@ -196,18 +187,16 @@ function editHealth(id) {
 }
 
 function addEquipment(id) {
-    const url = `add-equipment.html?id=${id}`; // Redirect to add-equipment page with member ID
+    const url = `add-equipment.html?id=${id}`;
     window.location.href = url;
 }
 
-// Function to calculate level based on XP
 function calculateLevel(xp) {
     let level = 1;
 
-    // Loop through the XP thresholds from lowest to highest
     for (let i = 0; i < xpThresholds.length; i++) {
         if (xp >= xpThresholds[i].xp) level = xpThresholds[i].level;
-        else break; // Stop the loop once the correct level and bonus are found
+        else break;
     }
 
     return level;

@@ -16,4 +16,4 @@ This project is a web-based application designed to manage a party of adventurer
 
 ## Youtube Link
 
-[Click here](link goes here)
+[Click here.](https://youtu.be/SBQAhj_T8pg)

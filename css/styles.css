@@ -6,7 +6,6 @@ body {
     padding: 20px;
 }
 
-/* layout.css */
 body, html {
     height: 100%;
     margin: 0;
@@ -14,18 +13,17 @@ body, html {
 
 .container {
     display: flex;
-    height: 100%;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 20px;
 }
 
-.left-half {
-    width: 50%;
-    padding: 20px;
-    border-right: 1px solid #ddd;
-}
-
-.right-half {
-    width: 50%;
-    padding: 20px;
+.left-half, .right-half {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
 }
 
 .form-container {
@@ -71,10 +69,10 @@ h1, h2 {
 }
 
 .button-container {
-    margin-top: 10px;
     display: flex;
     justify-content: center;
-    gap: 5px;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .button-container button {
@@ -95,4 +93,172 @@ h1, h2 {
     .party-item button {
         width: 100%;
     }
+}
+
+.equipment-list-container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: space-between;
+    padding: 20px;
+}
+
+.equipment-category {
+    flex: 1 1 calc(33.333% - 20px);
+    min-width: 280px;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+.equipment-category h3 {
+    text-align: center;
+    font-size: 1.25rem;
+    margin-bottom: 10px;
+}
+
+.equipment-list {
+    list-style: none;
+    padding: 0;
+}
+
+.equipment-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #fff;
+    padding: 10px;
+    border: 1px solid #ddd;
+    margin-bottom: 10px;
+    border-radius: 5px;
+}
+
+.equipment-list li button {
+    font-size: 0.8rem;
+}
+
+.equipment-gap {
+    height: 10px;
+}
+
+#load-more-btn {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.member-detail-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+}
+
+.member-detail-container h2 {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.member-info {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    text-align: center;
+    background: #f8f9fa;
+    padding: 20px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+    width: 80%;
+    margin-bottom: 20px;
+}
+
+.member-info p {
+    font-size: 1.1rem;
+}
+
+.member-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.member-buttons button {
+    padding: 10px 20px;
+    font-size: 1rem;
+    cursor: pointer;
+}
+
+.member-buttons button:hover {
+    background-color: #007bff;
+    color: white;
+}
+
+button {
+    font-size: 1rem;
+    padding: 10px 20px;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn {
+    display: inline-block;
+    font-weight: 600;
+    text-align: center;
+    color: white;
+    background-color: #007bff;
+    box-shadow: 0 4px 8px rgba(0, 123, 255, 0.2);
+}
+
+.btn:hover {
+    background-color: #0056b3;
+    box-shadow: 0 6px 12px rgba(0, 123, 255, 0.3);
+}
+
+.btn:focus, .btn:active {
+    outline: none;
+    box-shadow: 0 0 0 4px rgba(38, 143, 255, 0.5);
+}
+
+.btn-outline-primary {
+    background-color: white;
+    color: #007bff;
+    border: 2px solid #007bff;
+}
+
+.btn-outline-primary:hover {
+    background-color: #007bff;
+    color: white;
+    border: 2px solid #0056b3;
+}
+
+.btn-outline-primary:focus, .btn-outline-primary:active {
+    box-shadow: 0 0 0 4px rgba(0, 123, 255, 0.3);
+}
+
+.btn-secondary {
+    background-color: #6c757d;
+    color: white;
+    border: 2px solid #6c757d;
+    box-shadow: none;
+}
+
+.btn-secondary:hover {
+    background-color: #5a6268;
+    color: white;
+    border: 2px solid #5a6268;
+}
+
+.btn-secondary:focus, .btn-secondary:active {
+    box-shadow: 0 0 0 4px rgba(108, 117, 125, 0.3);
+}
+
+button:disabled {
+    background-color: #ccc;
+    color: #777;
+    cursor: not-allowed;
+    box-shadow: none;
 }

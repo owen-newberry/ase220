@@ -1,4 +1,4 @@
-const blobUrl = 'https://api.jsonbin.io/v3/b/67d119af8960c979a56fee3c';
+import { savePartyData, fetchPartyData } from './utils.js';
 
 const equipment = {
     armor: ["Plate Mail", "Leather Armor", "Chain Mail", "Ring Mail", "Scale Mail", "Splint Armor", "Brigandine Armor", "Hide Armor"],
@@ -10,81 +10,42 @@ const itemsPerPage = 4;
 let currentPage = 1;
 let currentCategory = 'armor';
 
-async function fetchPartyData() {
-    try {
-        const response = await fetch(blobUrl, {
-            method: 'GET',
-            headers: {
-                'X-Master-Key': '$2a$10$kbMZq5216WIBSG3qZKCxtuKqtIoLuLtZjeYF/OtJfQ6JBKR6RADRy',
-                'Content-Type': 'application/json',
-            }
-        });
-        const data = await response.json();
-        if (!response.ok) throw new Error('Failed to fetch party data');
-        partyData = data.record.record;
-        console.log('Party data saved successfully');
-    } catch (error) {
-        console.error('Error fetching party data:', error);
-    }
-}
-
-async function savePartyData() {
-    try {
-        console.log('Saving party data:', partyData);
-        const response = await fetch(blobUrl, {
-            method: 'PUT',
-            headers: {
-                'X-Master-Key': '$2a$10$kbMZq5216WIBSG3qZKCxtuKqtIoLuLtZjeYF/OtJfQ6JBKR6RADRy',
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({ record: partyData }),
-        });
-        if (!response.ok) throw new Error('Failed to save party data');
-    } catch (error) {
-        console.error('Error saving party data:', error);
-    }
-}
-
-async function getMemberById(id) {
-    await fetchPartyData();
-    const member = partyData.find(member => member.id === id);
-    document.getElementById('member-name').textContent = `Managing Equipment for: ${member.name}`;
-}
-
 const urlParams = new URLSearchParams(window.location.search);
 const memberId = parseInt(urlParams.get('id'));
-const member = getMemberById(memberId);
-if (!member.equipment) {
-    member.equipment = {
-        armor: [],
-        weapons: [],
-        misc: []
-    };
+
+async function getMemberById(id) {
+    const partyData = await fetchPartyData();
+    return partyData.find(member => member.id === id);
 }
 
-function displayCurrentEquipment(category) {
+async function displayCurrentEquipment(category) {
+    const member = await getMemberById(memberId);
+
     ['armor', 'weapons', 'misc'].forEach(cat => {
         const equipmentList = document.getElementById(`${cat}-current-list`);
         equipmentList.innerHTML = '';
     });
 
-    const equipmentList = document.getElementById(`${category}-current-list`);
-    member.equipment[category].forEach(item => {
-        const li = document.createElement('li');
-        li.classList.add('list-group-item');
-        li.textContent = item;
+    ['armor', 'weapons', 'misc'].forEach(category => {
+        const equipmentList = document.getElementById(`${category}-current-list`);
+        member.equipment[category].forEach(item => {
+            const li = document.createElement('li');
+            li.classList.add('list-group-item');
+            li.textContent = item;
 
-        const removeBtn = document.createElement('button');
-        removeBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'float-end');
-        removeBtn.textContent = 'Remove';
-        removeBtn.onclick = () => removeEquipment(category, item);
+            const removeBtn = document.createElement('button');
+            removeBtn.classList.add('btn', 'btn-danger', 'btn-sm', 'float-end');
+            removeBtn.textContent = 'Remove';
+            removeBtn.onclick = () => removeEquipment(category, item);
 
-        li.appendChild(removeBtn);
-        equipmentList.appendChild(li);
+            li.appendChild(removeBtn);
+            equipmentList.appendChild(li);
+        });
     });
 }
 
-function removeEquipment(category, item) {
+async function removeEquipment(category, item) {
+    const member = await getMemberById(memberId);
     member.equipment[category] = member.equipment[category].filter(equipment => equipment !== item);
     savePartyData();
     alert(`${item} removed from ${member.name}'s ${category}`);
@@ -124,6 +85,7 @@ function displayEquipment(category) {
 }
 
 async function addEquipment(category, item) {
+    const member = await getMemberById(memberId);
     member.equipment[category].push(item);
     await savePartyData();
     alert(`${item} added.`);

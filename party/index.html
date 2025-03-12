@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="../css/styles.css">
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Party Management</title>
+</head>
+<body>
+    <h1>Party Management</h1>
+
+    <!-- Form to add a new party member -->
+    <h2>Add New Member</h2>
+    <form id="add-member-form">
+        <input type="text" id="member-name" placeholder="Name" required>
+        <input type="text" id="member-class" placeholder="Class" required>
+        <input type="number" id="member-xp" placeholder="Starting XP" min="0" required>
+        <button type="submit">Add Member</button>
+    </form>
+
+    <h2>Party Members</h2>
+    <ul id="party-list"></ul>
+
+    <script src="../js/functions.js"></script>
+</body>
+</html>

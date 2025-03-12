@@ -1,0 +1,22 @@
+[
+    {
+        "id": 1,
+        "name": "Gorath the Brave",
+        "class": "Barbarian",
+        "xp": 1500,
+        "spellSlots": {
+            "level1": 0,
+            "level2": 0
+        }
+    },
+    {
+        "id": 2,
+        "name": "Elara the Wise",
+        "class": "Wizard",
+        "xp": 900,
+        "spellSlots": {
+            "level1": 2,
+            "level2": 1
+        }
+    }
+]

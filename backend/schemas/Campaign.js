@@ -13,7 +13,7 @@ class Campaign {
     }
 }
 
-const ItemSchema = new Schema({
+const CampaignSchema = new Schema({
     name: {
         type: String,
         required: true,

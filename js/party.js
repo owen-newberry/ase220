@@ -1,7 +1,14 @@
-import { calculateLevel, savePartyData, fetchPartyData, blobUrl } from './utils.js';
+import { calculateLevel, savePartyData, fetchPartyData, deletePartyMember } from './utils.js';
+const campaignId = getCampaignIdFromUrl();
 
 async function initialize() {
-    const partyData = await fetchPartyData();
+    const partyData = await fetchPartyData(campaignId);
+
+    if (!partyData || !Array.isArray(partyData)) {
+        console.error('Invalid or missing party data.');
+        return;
+    }
+
     displayParty(partyData);
 }
 
@@ -17,8 +24,8 @@ function displayParty(party) {
         memberContainer.classList.add('member-container');
 
         const detailLink = document.createElement('a');
-        detailLink.href = `detail.html?id=${member.id}`;
-        detailLink.textContent = `${member.name} (Class: ${member.class}, XP: ${member.xp}, Level: ${member.level})`;
+        detailLink.href = `detail.html?campaignId=${campaignId}id=${member._id}`;
+        detailLink.textContent = `${member.name} (Class: ${member.playerClass}, XP: ${member.xp}, Level: ${member.level})`;
 
         const buttonContainer = document.createElement('div');
         buttonContainer.classList.add('button-container');
@@ -26,12 +33,12 @@ function displayParty(party) {
         const manageEquipmentBtn = document.createElement('button');
         manageEquipmentBtn.textContent = 'Manage Equipment';
         manageEquipmentBtn.className = "btn btn-info-xs";
-        manageEquipmentBtn.onclick = () => manageEquipment(member.id);
+        manageEquipmentBtn.onclick = () => manageEquipment(member._id);
 
         const removeBtn = document.createElement('button');
         removeBtn.textContent = 'Remove';
         removeBtn.className = "btn btn-danger-xs";
-        removeBtn.onclick = () => removeMember(member.id, listItem);
+        removeBtn.onclick = () => removeMember(member._id, listItem);
 
         buttonContainer.appendChild(manageEquipmentBtn);
         buttonContainer.appendChild(removeBtn);
@@ -45,68 +52,52 @@ function displayParty(party) {
 
 async function addMember(e) {
     e.preventDefault();
-    
-    let partyData = await fetchPartyData();
+
     const name = document.getElementById('member-name').value.trim();
     const classType = document.getElementById('member-class').value.trim();
     const xp = parseInt(document.getElementById('member-xp').value.trim()) || 0;
     const level = calculateLevel(xp);
     const health = level * 5 + 3;
-    const bonus = Math.floor(level/4) + 2;
+    const bonus = Math.floor(level / 4) + 2;
 
     if (name && classType) {
-        const newId = partyData.length ? Math.max(...partyData.map(member => member.id)) + 1 : 1;
-
         const newMember = {
-            id: newId,
             name: name,
-            class: classType,
+            playerClass: classType,
             xp: xp,
             level: level,
             bonus: bonus,
-            health: health,
-            equipment: {
-                armor: [],
-                weapons: [],
-                misc: [],
+            health: {
+                current: health,
+                max: health
             },
+            items: [],
+            campaign: campaignId
         };
-        partyData.push(newMember);
-        await savePartyData();
-
-        displayParty(partyData);
+        
+        await savePartyData(newMember, campaignId);
 
         document.getElementById('add-member-form').reset();
+        initialize();
     }
 }
 
 async function removeMember(id) {
     const confirmation = confirm('Are you sure you want to delete this member? This action cannot be undone.');
     if (confirmation) {
-        let partyData = await fetchPartyData();
-        partyData = partyData.filter(member => member.id !== id);
-        
-        try {
-            const response = await fetch(blobUrl, {
-                method: 'PUT',
-                headers: {
-                    'X-Master-Key': '$2a$10$kbMZq5216WIBSG3qZKCxtuKqtIoLuLtZjeYF/OtJfQ6JBKR6RADRy',
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ record: partyData }),
-            });
-            if (!response.ok) throw new Error('Failed to save party data');
-        } catch (error) {
-            console.error('Error saving party data:', error);
-        }
-        
-        displayParty(partyData);
+        await deletePartyMember(id);
+        initialize();
     }
 }
 
 function manageEquipment(id) {
-    const url = `add-equipment.html?id=${id}`;
+    const url = `add-items.html?campaignId=${campaignId}&id=${id}`;
     window.location.href = url;
+}
+
+function getCampaignIdFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    return params.get('campaignId');
 }
 
 document.getElementById('add-member-form').addEventListener('submit', addMember);

@@ -8,9 +8,8 @@ class ErrorResponse extends Error {
       super(message);
       this.statusCode = statusCode;
       this.status = `${statusCode}`.startsWith('4') ? 'fail' : 'error';
-      this.isOperational = true; // Distinguish operational errors from programming errors
+      this.isOperational = true;
   
-      // Capture stack trace (excluding constructor call from it)
       Error.captureStackTrace(this, this.constructor);
     }
   }

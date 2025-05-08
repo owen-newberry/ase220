@@ -1,26 +1,6 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 
-class PartyMember {
-    constructor(
-        name,
-        playerClass,
-        xp,
-        level,
-        bonus,
-        health,
-        items
-    ) {
-        this.name = name;
-        this.playerClass = playerClass;
-        this.xp = xp;
-        this.level = level;
-        this.bonus = bonus;
-        this.health = health;
-        this.items = items;
-    }
-}
-
 const PartyMemberSchema = new Schema({
     name: {
         type: String,
@@ -50,18 +30,27 @@ const PartyMemberSchema = new Schema({
         current: Number,
         max: Number
     },
-    items: {
-        item: {
-            type: mongoose.Schema.Types.ObjectId,
-            ref: 'Item'
-        },
+    items: [{
+        name: String,
+        description: String,
+        properties: Schema.Types.Mixed,
+        publisher: String,
+        book: String,
         quantity: {
             type: Number,
             default: 1
         }
+    }],
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'user',
+        required: true
+    },
+    campaign: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'campaigns',
+        required: true
     }
 });
-
-PartyMemberSchema.loadClass(PartyMember);
 
 module.exports = mongoose.model('partyMembers', PartyMemberSchema);

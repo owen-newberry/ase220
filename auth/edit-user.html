@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Edit User Information</title>
+  <link href="../css/styles.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet">
+  
+  <style>
+    .container {
+      display: flex;
+      justify-content: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2 class="mt-4">Edit User Information</h2>
+    <div id="status" class="alert d-none"></div>
+    <form id="edit-form" style="width: 100%; max-width: 500px;">
+      <div class="mb-3">
+        <label for="field" class="form-label">Choose what to change</label>
+        <select class="form-select" id="field" required>
+          <option value="">Select a field</option>
+          <option value="username">Username</option>
+          <option value="email">Email</option>
+          <option value="password">Password</option>
+        </select>
+      </div>
+
+      <div class="mb-3" id="current-value-group">
+        <label for="currentValue" class="form-label" id="current-value-label">Current Value</label>
+        <input type="text" class="form-control" id="currentValue" required>
+      </div>
+
+      <div class="mb-3 d-none" id="new-value-group">
+        <label for="newValue" class="form-label" id="new-value-label">New Value</label>
+        <input type="text" class="form-control" id="newValue" required>
+      </div>
+
+      <button type="submit" class="btn btn-primary">Save Changes</button>
+      <button type="button" class="btn btn-danger" id="delete-account">Delete Account</button>
+    </form>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="../js/edit-user.js"></script>
+</body>
+</html>

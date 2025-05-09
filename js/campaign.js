@@ -119,3 +119,6 @@ async function removeCampaign(campaignId) {
     loadCampaigns();
 });
 
+document.getElementById('user-btn').onclick = () => {
+    window.location.href = `../auth/edit-user.html`;
+};

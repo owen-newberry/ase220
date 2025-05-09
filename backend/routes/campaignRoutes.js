@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const campaignController = require('../controllers/campaignController');
-const authMiddleware = require('../middleware/auth');
+const authMiddleware = require('../middleware/authMiddleware');
 
 router.post('/', authMiddleware.protect, campaignController.createCampaign);
 router.get('/', authMiddleware.protect, campaignController.getAllCampaigns);

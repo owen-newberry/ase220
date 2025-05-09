@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const partyMemberController = require('../controllers/partyMemberController');
-const authMiddleware = require('../middleware/auth'); 
+const authMiddleware = require('../middleware/authMiddleware'); 
 
 router.post('/:campaignId', authMiddleware.protect, partyMemberController.createPartyMember);
 router.get('/:campaignId', authMiddleware.protect, partyMemberController.getPartyMembers);

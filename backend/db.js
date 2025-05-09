@@ -5,7 +5,6 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/authRoutes');
 const campaignRoutes = require('./routes/campaignRoutes');
 const partyMemberRoutes = require('./routes/partyMemberRoutes');
-const errorMiddleware = require('./middleware/error');
 const cors = require('cors');
 
 const app = express();

@@ -149,61 +149,107 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-exports.restrictTo = (...roles) => {
-  return (req, res, next) => {
-    if (!roles.includes(req.user.role)) {
-      return res.status(403).json({
-        status: 'fail',
-        message: 'You do not have permission to perform this action'
-      });
-    }
-    next();
-  };
-};
-
-exports.getMe = async (req, res, next) => {
+exports.readUser = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).populate('campaigns');
-
-    res.status(200).json({
-      status: 'success',
-      data: {
-        user
-      }
-    });
+    const userId = req.user.id;
+    const user = await User.findById(userId).select('-password');
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json(user);
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message
-    });
+    res.status(500).json({ error: 'Server error' });
   }
 };
 
-exports.updatePassword = async (req, res, next) => {
+exports.updateUsername = async (req, res) => {
   try {
-    const user = await User.findById(req.user.id).select('+password');
+    const userId = req.user.id;
+    const { username } = req.body;
+    if (!username) return res.status(400).json({ error: 'Username required' });
 
-    if (!(await user.comparePassword(req.body.currentPassword, user.password))) {
-      return res.status(401).json({
-        status: 'fail',
-        message: 'Your current password is wrong.'
-      });
-    }
-
-    user.password = req.body.newPassword;
-    await user.save();
-
-    const token = signToken(user._id);
-    
-    res.status(200).json({
-      status: 'success',
-      token,
-      message: 'Password updated successfully!'
-    });
+    await User.findByIdAndUpdate(userId, { username });
+    res.json({ message: 'Username updated' });
   } catch (err) {
-    res.status(400).json({
-      status: 'fail',
-      message: err.message
-    });
+    res.status(500).json({ error: 'Server error' });
   }
 };
+
+exports.updateEmail = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email required' });
+
+    await User.findByIdAndUpdate(userId, { email });
+    res.json({ message: 'Email updated' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.updatePassword = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const { password } = req.body;
+    if (!password) return res.status(400).json({ error: 'Password required' });
+
+    const hashed = await bcrypt.hash(password, 10);
+    await User.findByIdAndUpdate(userId, { password: hashed });
+    res.json({ message: 'Password updated' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.deleteUser = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    await User.findByIdAndDelete(userId);
+    req.session?.destroy(() => {});
+    res.json({ message: 'Account deleted' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+};
+
+exports.verifyUsername = async (req, res) => {
+  try {
+    const { username } = req.body;
+    const user = req.user;
+
+    if (!user) {
+      return res.status(400).json({ error: 'Username not found.' });
+    }
+    res.status(200).json({ message: 'Username verified.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
+exports.verifyEmail = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user  = req.user;
+
+    if (!user) {
+      return res.status(400).json({ error: 'Email not found.' });
+    }
+    res.status(200).json({ message: 'Email verified.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+}
+
+exports.verifyPassword = async (req, res) => {
+  try {
+    const { password } = req.body;
+    const user =  req.user;
+
+    const isMatch = await bcrypt.compare(password, user.password);
+    if (!isMatch) {
+      return res.status(400).json({ error: 'Password is incorrect.' });
+    }
+    res.status(200).json({ message: 'Password verified.' });
+  } catch (err) {
+    res.status(500).json({ error: 'Server error' });
+  }
+}

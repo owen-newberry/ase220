@@ -1,4 +1,4 @@
-import { savePartyData, fetchPartyData, loadAllItems, getCurrentItems, getPartyMemberById, updatePartyMember } from './utils.js';
+import { loadAllItems, getPartyMemberById, updatePartyMember } from './utils.js';
 
 const items = await loadAllItems();
 const campaignId = getCampaignIdFromUrl();

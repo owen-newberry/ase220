@@ -1,19 +1,16 @@
 const mongoose = require('mongoose');
 const { Schema } = mongoose;
 const bcrypt = require('bcryptjs');
-const authUtils = require("../utils/authUtils");
 
 const UserSchema = new Schema({
     username: {
       type: String,
       required: [true, 'Please provide a username'],
-      unique: true,
       trim: true
     },
     email: {
       type: String,
       required: [true, 'Please provide an email'],
-      unique: true,
       match: [/.+\@.+\..+/, 'Please enter a valid email']
     },
     password: {

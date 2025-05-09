@@ -103,7 +103,7 @@ function getCampaignIdFromUrl() {
 document.getElementById('add-member-form').addEventListener('submit', addMember);
 
 document.getElementById('back-btn').onclick = () => {
-    window.location.href = `index.html?campaignId=${campaignId}`;
+    window.location.href = `../campaign/index.html`;
 };
 
 initialize();

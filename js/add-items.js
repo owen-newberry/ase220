@@ -176,5 +176,6 @@ function getCampaignIdFromUrl() {
     return params.get('campaignId');
 }
 
+
 displayItems('armor');
 displayCurrentItems(memberId);

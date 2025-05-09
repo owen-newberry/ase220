@@ -122,3 +122,8 @@ async function removeCampaign(campaignId) {
 document.getElementById('user-btn').onclick = () => {
     window.location.href = `../auth/edit-user.html`;
 };
+
+document.getElementById('logout-btn').addEventListener('click', () => {
+    localStorage.removeItem('jwt');
+    window.location.href = '../auth/index.html';
+});

@@ -95,7 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
     
             if (res.ok) {
                 alert('Account deleted.');
-                window.location.href = '/login.html';
+                window.location.href = '../auth/index.html';
             } else {
                 showStatus(data.error || 'Failed to delete account.', 'danger');
             }
@@ -115,3 +115,7 @@ document.addEventListener('DOMContentLoaded', () => {
         return str[0].toUpperCase() + str.slice(1);
     }
 });
+
+document.getElementById('back-btn').onclick = () => {
+    window.location.href = `../campaign/index.html`;
+};

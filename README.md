@@ -148,4 +148,4 @@ Start the frontend using LiveServer or similar.
 
 ## Youtube Link
 
-[Click here.](https://youtu.be/SBQAhj_T8pg)
+[Click here.](https://youtu.be/NbsxQ31yegkg)

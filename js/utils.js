@@ -1,8 +1,9 @@
+const token = localStorage.getItem('jwt');
+const baseUrl = 'http://localhost:5000/api/partyMember';
+
 let partyData = [];
 
-export const blobUrl = 'https://api.jsonbin.io/v3/b/67d119af8960c979a56fee3c'
-
-const xpThresholds = [
+export const xpThresholds = [
     { xp: 0, level: 1 },
     { xp: 300, level: 2 },
     { xp: 900, level: 3 },
@@ -36,36 +37,118 @@ export function calculateLevel(xp) {
     return level;
 }
 
-export async function fetchPartyData() {
+export async function fetchPartyData(campaignId) {
     try {
-        const response = await fetch(blobUrl, {
+        const response = await fetch(`${baseUrl}/${campaignId}`, {
             method: 'GET',
             headers: {
-                'X-Master-Key': '$2a$10$kbMZq5216WIBSG3qZKCxtuKqtIoLuLtZjeYF/OtJfQ6JBKR6RADRy',
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             }
         });
-        const data = await response.json();
+
         if (!response.ok) throw new Error('Failed to fetch party data');
-        partyData = data.record.record;
+
+        const data = await response.json();
+        partyData = data.data.partyMembers;
         return partyData;
     } catch (error) {
         console.error('Error fetching party data:', error);
     }
 }
 
-export async function savePartyData() {
+export async function savePartyData(newPartyMember, campaignId) {
     try {
-        const response = await fetch(blobUrl, {
-            method: 'PUT',
+        const response = await fetch(`${baseUrl}/${campaignId}`, {
+            method: 'POST',
             headers: {
-                'X-Master-Key': '$2a$10$kbMZq5216WIBSG3qZKCxtuKqtIoLuLtZjeYF/OtJfQ6JBKR6RADRy',
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
             },
-            body: JSON.stringify({ record: partyData }),
+            body: JSON.stringify(newPartyMember),
         });
-        if (!response.ok) throw new Error('Failed to save party data');
+
+        if (!response.ok) throw new Error('Failed to save new party member');
+
+        const data = await response.json();
+        return data;
     } catch (error) {
         console.error('Error saving party data:', error);
     }
+}
+
+export async function updatePartyMember(id, updatedData) {
+    try {
+        const response = await fetch(`${baseUrl}/id/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+            body: JSON.stringify(updatedData),
+        });
+
+        if (!response.ok) throw new Error('Failed to update party member');
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error updating party member:', error);
+    }
+}
+
+export async function deletePartyMember(id) {
+    try {
+        const response = await fetch(`${baseUrl}/id/${id}`, {
+            method: 'DELETE',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to delete party member');
+    } catch (error) {
+        console.error('Error deleting party member:', error);
+    }
+}
+
+export async function getPartyMemberById(id) {
+    try {
+        const response = await fetch(`${baseUrl}/id/${id}`, {
+            method: 'GET',
+            headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${token}`
+            },
+        });
+
+        if (!response.ok) throw new Error('Failed to fetch party member data');
+
+        const data = await response.json();
+        const member = data.data.partyMember
+        return member;
+    } catch (error) {
+        console.error('Error fetching party member data:', error);
+    }
+}
+
+export async function getCurrentItems(id) {
+    const member = await getMemberById(id);
+    const items = member.items;
+
+    return items;
+}
+
+export async function loadAllItems() {
+    const response = await fetch('../data/items.json');
+    const items = await response.json();
+
+    return {
+        armor: items.filter(item => item.properties?.["Item Type"] === "Armor"),
+        weapons: items.filter(item => item.properties?.["Item Type"] === "Weapon"),
+        misc: items.filter(item =>
+            !["Armor", "Weapon"].includes(item.properties?.["Item Type"])
+        )
+    };
 }

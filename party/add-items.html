@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Equipment</title>
+    <link rel="stylesheet" href="../css/styles.css">
+</head>
+<body>
+    <button id="back-btn" class="btn btn-secondary">Back to Party Dashboard</button>
+    
+    <div class="container">
+        <div class="left-half">
+            <h1 id="member-name">Equipment Types:</h1>
+
+            <div class="button-container">
+                <button id="armor-tab" class="btn btn-outline-primary">Armor</button>
+                <button id="weapons-tab" class="btn btn-outline-primary">Weapons</button>
+                <button id="misc-tab" class="btn btn-outline-primary">Miscellaneous</button>
+            </div>
+        </div>
+
+        <div class="right-half">
+            <h2>Current Equipment</h2>
+            <div class="equipment-list-container">
+                <ul id="armor-current-list" class="equipment-list"></ul>
+                <ul id="weapons-current-list" class="equipment-list"></ul>
+                <ul id="misc-current-list" class="equipment-list"></ul>
+            </div>
+
+            <h2>Available Equipment</h2>
+            <div class="equipment-list-container">
+                <ul id="armor-list" class="equipment-list"></ul>
+                <ul id="weapons-list" class="equipment-list"></ul>
+                <ul id="misc-list" class="equipment-list"></ul>
+            </div>
+
+            <button id="load-more-btn" class="btn btn-primary">Load More</button>
+        </div>
+    </div>
+
+    <script type="module" src="../js/add-items.js"></script>
+    <script type="module" src="../js/utils.js"></script>
+</body>
+</html>

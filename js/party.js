@@ -24,7 +24,7 @@ function displayParty(party) {
         memberContainer.classList.add('member-container');
 
         const detailLink = document.createElement('a');
-        detailLink.href = `detail.html?campaignId=${campaignId}id=${member._id}`;
+        detailLink.href = `detail.html?campaignId=${campaignId}&id=${member._id}`;
         detailLink.textContent = `${member.name} (Class: ${member.playerClass}, XP: ${member.xp}, Level: ${member.level})`;
 
         const buttonContainer = document.createElement('div');

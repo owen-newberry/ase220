@@ -1,9 +1,10 @@
 import { calculateLevel, getPartyMemberById, updatePartyMember } from './utils.js';
 const campaignId = getCampaignIdFromUrl();
+const urlParams = new URLSearchParams(window.location.search);
+const memberId = urlParams.get('id');
 
 async function displayMemberDetails() {
-    const urlParams = new URLSearchParams(window.location.search);
-    const memberId = urlParams.get('id');
+    
 
     try {
         const member = await getPartyMemberById(memberId);
